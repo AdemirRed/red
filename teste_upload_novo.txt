@@ -1,0 +1,4 @@
+Arquivo de teste para upload
+Criado para testar a funcionalidade de upload do CloudShare Pro
+Data: 2025-01-02
+Hora: $(Get-Date)

@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudShare Pro - Sistema Profissional de Arquivos</title>
+    
+    <!-- Meta tags -->
+    <meta name="description" content="Sistema profissional de gerenciamento e compartilhamento de arquivos">
+    <meta name="theme-color" content="#1a1d21">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="logo-container">
+                <i class="fas fa-cloud"></i>
+                <span>CloudShare Pro</span>
+            </div>
+            <div class="loading-spinner"></div>
+            <p>Carregando sistema...</p>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" style="display: none;">
+        <!-- Header Profissional -->
+        <header class="main-header">
+            <div class="header-left">
+                <div class="logo-container">
+                    <i class="fas fa-cloud"></i>
+                    <span>CloudShare Pro</span>
+                </div>
+                
+                <div class="breadcrumb">
+                    <i class="fas fa-folder"></i>
+                    <span id="pageTitle">Meus Arquivos</span>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="globalSearch" placeholder="Buscar arquivos...">
+                    <div class="search-filters">
+                        <select id="typeFilter" class="filter-select">
+                            <option value="all">Todos os tipos</option>
+                            <option value="image">Imagens</option>
+                            <option value="video">Vídeos</option>
+                            <option value="audio">Áudios</option>
+                            <option value="document">Documentos</option>
+                            <option value="archive">Arquivos</option>
+                            <option value="executable">Executáveis</option>
+                        </select>
+                        
+                        <select id="dateFilter" class="filter-select">
+                            <option value="all">Todas as datas</option>
+                            <option value="today">Hoje</option>
+                            <option value="week">Esta semana</option>
+                            <option value="month">Este mês</option>
+                            <option value="year">Este ano</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <button id="uploadBtn" class="btn-upload">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Upload
+                </button>
+                
+                <div class="user-menu">
+                    <div id="userInfo" class="user-info">
+                        <div id="userAvatar" class="user-avatar">👤</div>
+                        <div class="user-details">
+                            <div id="userName" class="user-name">Visitante</div>
+                            <div id="userRole" class="user-role">Modo Público</div>
+                        </div>
+                    </div>
+                    
+                    <div class="user-menu-dropdown">
+                        <a href="#" id="loginBtn" class="menu-item">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Fazer Login
+                        </a>
+                        <a href="#" id="profileBtn" class="menu-item">
+                            <i class="fas fa-user"></i>
+                            Perfil
+                        </a>
+                        <a href="#" id="settingsBtn" class="menu-item">
+                            <i class="fas fa-cog"></i>
+                            Configurações
+                        </a>
+                        <hr>
+                        <a href="#" id="logoutBtn" class="menu-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Layout Principal -->
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <div class="nav-section">
+                        <h3 class="nav-title">Navegação</h3>
+                        <ul class="nav-list">
+                            <li>
+                                <a href="#" class="nav-link active" data-view="my-files">
+                                    <i class="fas fa-folder"></i>
+                                    <span>Meus Arquivos</span>
+                                    <span id="myFilesCount" class="nav-count">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-link" data-view="public-files">
+                                    <i class="fas fa-globe"></i>
+                                    <span>Arquivos Públicos</span>
+                                    <span id="publicFilesCount" class="nav-count">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-link" data-view="recent">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Recentes</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-link" data-view="shared">
+                                    <i class="fas fa-share-alt"></i>
+                                    <span>Compartilhados</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <h3 class="nav-title">Categorias</h3>
+                        <ul class="nav-list">
+                            <li>
+                                <a href="#" class="nav-link" data-filter="image">
+                                    <i class="fas fa-image"></i>
+                                    <span>Imagens</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-link" data-filter="video">
+                                    <i class="fas fa-video"></i>
+                                    <span>Vídeos</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-link" data-filter="audio">
+                                    <i class="fas fa-music"></i>
+                                    <span>Áudios</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-link" data-filter="document">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>Documentos</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-link" data-filter="archive">
+                                    <i class="fas fa-file-archive"></i>
+                                    <span>Arquivos</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-link" data-filter="executable">
+                                    <i class="fas fa-cogs"></i>
+                                    <span>Executáveis</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div id="adminSection" class="nav-section" style="display: none;">
+                        <h3 class="nav-title">Administração</h3>
+                        <ul class="nav-list">
+                            <li>
+                                <a href="#" class="nav-link" data-view="admin">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>Painel Admin</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-link" data-view="users">
+                                    <i class="fas fa-users"></i>
+                                    <span>Usuários</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Conteúdo Principal -->
+            <main class="main-content">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <div class="view-toggle">
+                            <button id="gridViewBtn" class="view-btn active" title="Visualização em Grade">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button id="listViewBtn" class="view-btn" title="Visualização em Lista">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="sort-options">
+                            <select id="sortFilter" class="filter-select">
+                                <option value="date_desc">Mais recentes</option>
+                                <option value="date_asc">Mais antigos</option>
+                                <option value="name_asc">Nome A-Z</option>
+                                <option value="name_desc">Nome Z-A</option>
+                                <option value="size_asc">Menor tamanho</option>
+                                <option value="size_desc">Maior tamanho</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="toolbar-right">
+                        <button class="btn-secondary">
+                            <i class="fas fa-filter"></i>
+                            Filtros avançados
+                        </button>
+                        
+                        <button class="btn-secondary">
+                            <i class="fas fa-download"></i>
+                            Download múltiplo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Área de Upload (Oculta por padrão) -->
+                <div id="uploadArea" class="upload-area" style="display: none;">
+                    <div class="upload-content">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Arraste arquivos aqui ou clique para selecionar</h3>
+                        <div id="uploadLimitsInfo" class="upload-limits-info">
+                            <p>Suporte para múltiplos arquivos</p>
+                        </div>
+                        <!-- Seletor de visibilidade: só aparece quando logado -->
+                        <div id="uploadVisibilitySelector" class="upload-visibility-selector" style="display: none;">
+                            <span class="visibility-label">Visibilidade:</span>
+                            <label class="visibility-option">
+                                <input type="radio" name="uploadVisibility" value="false" checked>
+                                <i class="fas fa-lock"></i> Privado (só eu vejo)
+                            </label>
+                            <label class="visibility-option">
+                                <input type="radio" name="uploadVisibility" value="true">
+                                <i class="fas fa-globe"></i> Público (todos veem)
+                            </label>
+                        </div>
+                        <input type="file" id="fileInput" multiple style="display: none;">
+                    </div>
+                </div>
+
+                <!-- Visualização de Arquivos -->
+                <div class="files-container">
+                    <!-- Loading State -->
+                    <div id="loadingState" class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Carregando arquivos...</p>
+                    </div>
+
+                    <!-- Grid View -->
+                    <div id="filesGrid" class="files-grid active">
+                        <!-- Arquivos serão inseridos via JavaScript -->
+                    </div>
+
+                    <!-- List View -->
+                    <div id="filesList" class="files-list">
+                        <div class="table-header">
+                            <div class="table-cell name">Nome</div>
+                            <div class="table-cell size">Tamanho</div>
+                            <div class="table-cell date">Data</div>
+                            <div class="table-cell actions">Ações</div>
+                        </div>
+                        <div id="filesTableBody" class="table-body">
+                            <!-- Linhas serão inseridas via JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h3>Nenhum arquivo encontrado</h3>
+                        <p>Faça upload do primeiro arquivo ou ajuste os filtros</p>
+                        <button class="btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Adicionar arquivos
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div id="modalOverlay" class="modal-overlay">
+        <!-- Modal de Login -->
+        <div id="loginModal" class="modal login-modal">
+            <div class="modal-header">
+                <h2>CloudShare Pro</h2>
+                <p>Sistema Profissional de Gerenciamento de Arquivos</p>
+            </div>
+            
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUsername">Usuário ou Email:</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Senha:</label>
+                        <input type="password" id="loginPassword" required>
+                        <a href="#" id="forgotPasswordLink" class="forgot-password-link" style="font-size: 12px; color: #6c757d; text-decoration: none; display: block; margin-top: 5px; text-align: right;">
+                            Esqueceu a senha?
+                        </a>
+                    </div>
+                    
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Entrar
+                    </button>
+                </form>
+                
+                <div class="login-divider">
+                    <span>ou</span>
+                </div>
+                
+                <button id="guestAccess" class="btn-guest">
+                    <i class="fas fa-eye"></i>
+                    Acessar como visitante
+                </button>
+                
+                <div class="login-footer">
+                    <p>Não tem uma conta? <a href="#" id="createAccountLink">Criar conta</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Recuperação de Senha -->
+        <div id="resetPasswordModal" class="modal login-modal" style="display: none;">
+            <div class="modal-header">
+                <h2>🔐 Recuperar Senha</h2>
+                <p>Digite seu usuário ou email e escolha uma nova senha</p>
+            </div>
+            
+            <div class="modal-body">
+                <form id="resetPasswordForm">
+                    <div class="form-group">
+                        <label for="resetIdentifier">Usuário ou Email:</label>
+                        <input type="text" id="resetIdentifier" placeholder="Digite seu usuário ou email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resetNewPassword">Nova Senha:</label>
+                        <input type="password" id="resetNewPassword" placeholder="Digite a nova senha (mín. 4 caracteres)" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resetConfirmPassword">Confirmar Nova Senha:</label>
+                        <input type="password" id="resetConfirmPassword" placeholder="Digite novamente a nova senha" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-key"></i>
+                        Resetar Senha
+                    </button>
+                </form>
+                
+                <div class="login-footer" style="margin-top: 20px;">
+                    <p><a href="#" id="backToLoginLink">← Voltar ao login</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Compartilhamento -->
+        <div id="shareModal" class="modal share-modal">
+            <div class="modal-header">
+                <h3>Compartilhar Arquivo</h3>
+                <button class="close-btn" onclick="cloudShare.closeShareModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="share-info">
+                    <div class="file-preview">
+                        <i id="shareFileIcon" class="fas fa-file"></i>
+                        <div class="file-details">
+                            <h4 id="shareFileName">Nome do arquivo</h4>
+                            <p id="shareFileSize">Tamanho</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="share-links">
+                    <div class="form-group">
+                        <label>Link Direto:</label>
+                        <div class="link-input">
+                            <input type="text" id="shareDirectLink" readonly>
+                            <button class="copy-btn" onclick="cloudShare.copyToClipboard('shareDirectLink')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Link de Download:</label>
+                        <div class="link-input">
+                            <input type="text" id="shareDownloadLink" readonly>
+                            <button class="copy-btn" onclick="cloudShare.copyToClipboard('shareDownloadLink')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="share-actions">
+                    <button class="btn-secondary" onclick="cloudShare.closeShareModal()">
+                        Fechar
+                    </button>
+                    <button class="btn-primary" onclick="cloudShare.openShareLink()">
+                        <i class="fas fa-external-link-alt"></i>
+                        Abrir Link
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Perfil -->
+        <div id="profileModal" class="modal profile-modal" style="display: none;">
+            <div class="modal-header">
+                <h2><i class="fas fa-user"></i> Meu Perfil</h2>
+                <button class="close-btn" onclick="cloudShare.hideAllModals()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="profile-section">
+                    <div class="profile-avatar-section">
+                        <div id="profileAvatarLarge" class="profile-avatar-large">👤</div>
+                        <button class="btn-secondary btn-small">
+                            <i class="fas fa-camera"></i>
+                            Alterar Foto
+                        </button>
+                    </div>
+                    
+                    <div class="profile-info">
+                        <div class="profile-stats">
+                            <div class="stat-card">
+                                <i class="fas fa-folder"></i>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="profileFilesCount">0</span>
+                                    <span class="stat-label">Arquivos</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-database"></i>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="profileStorageUsed">0 MB</span>
+                                    <span class="stat-label">Armazenamento</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-calendar"></i>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="profileMemberSince">-</span>
+                                    <span class="stat-label">Membro desde</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-details">
+                            <div class="form-group">
+                                <label>Nome de Usuário:</label>
+                                <input type="text" id="profileUsername" readonly>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Email:</label>
+                                <input type="email" id="profileEmail" placeholder="Adicionar email">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Tipo de Conta:</label>
+                                <input type="text" id="profileAccountType" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-actions">
+                            <button class="btn-primary" onclick="cloudShare.updateProfile()">
+                                <i class="fas fa-save"></i>
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Configurações -->
+        <div id="settingsModal" class="modal settings-modal" style="display: none;">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Configurações</h2>
+                <button class="close-btn" onclick="cloudShare.hideAllModals()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="settings-tabs">
+                    <button class="settings-tab active" data-tab="security">
+                        <i class="fas fa-shield-alt"></i>
+                        Segurança
+                    </button>
+                    <button class="settings-tab" data-tab="preferences">
+                        <i class="fas fa-sliders-h"></i>
+                        Preferências
+                    </button>
+                    <button class="settings-tab" data-tab="privacy">
+                        <i class="fas fa-user-shield"></i>
+                        Privacidade
+                    </button>
+                </div>
+                
+                <div class="settings-content">
+                    <!-- Aba Segurança -->
+                    <div id="securityTab" class="settings-tab-content active">
+                        <h3>Alterar Senha</h3>
+                        <form id="changePasswordForm">
+                            <div class="form-group">
+                                <label>Senha Atual:</label>
+                                <input type="password" id="currentPassword" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Nova Senha:</label>
+                                <input type="password" id="newPassword" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Confirmar Nova Senha:</label>
+                                <input type="password" id="confirmNewPassword" required>
+                            </div>
+                            
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-key"></i>
+                                Alterar Senha
+                            </button>
+                        </form>
+                        
+                        <hr style="margin: 30px 0;">
+                        
+                        <h3>Sessões Ativas</h3>
+                        <div class="sessions-list">
+                            <div class="session-item">
+                                <i class="fas fa-laptop"></i>
+                                <div class="session-info">
+                                    <strong>Este dispositivo</strong>
+                                    <span>Última atividade: Agora</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Aba Preferências -->
+                    <div id="preferencesTab" class="settings-tab-content">
+                        <h3>Aparência</h3>
+                        <div class="form-group">
+                            <label>Tema:</label>
+                            <select id="themeSelect" class="filter-select">
+                                <option value="dark">Escuro</option>
+                                <option value="light">Claro</option>
+                                <option value="auto">Automático</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Visualização Padrão:</label>
+                            <select id="defaultViewSelect" class="filter-select">
+                                <option value="grid">Grade</option>
+                                <option value="list">Lista</option>
+                            </select>
+                        </div>
+                        
+                        <h3>Exibição</h3>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="showHiddenFiles">
+                                Mostrar arquivos ocultos
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="autoPlayVideos" checked>
+                                Reproduzir vídeos automaticamente ao visualizar
+                            </label>
+                        </div>
+                        
+                        <button class="btn-primary" onclick="cloudShare.savePreferences()">
+                            <i class="fas fa-save"></i>
+                            Salvar Preferências
+                        </button>
+                    </div>
+                    
+                    <!-- Aba Privacidade -->
+                    <div id="privacyTab" class="settings-tab-content">
+                        <h3>Privacidade dos Arquivos</h3>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="defaultPrivateFiles" checked>
+                                Novos arquivos são privados por padrão
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="requirePasswordShare">
+                                Exigir senha para compartilhamentos
+                            </label>
+                        </div>
+                        
+                        <h3>Dados da Conta</h3>
+                        <p style="color: #6c757d; font-size: 14px; margin-bottom: 15px;">
+                            Gerencie os dados da sua conta e solicitações de privacidade.
+                        </p>
+                        
+                        <button class="btn-secondary">
+                            <i class="fas fa-download"></i>
+                            Exportar Dados
+                        </button>
+                        
+                        <button class="btn-danger" style="margin-left: 10px;">
+                            <i class="fas fa-trash"></i>
+                            Excluir Conta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Recuperação de Senha com Email -->
+        <div id="emailResetModal" class="modal login-modal" style="display: none;">
+            <div class="modal-header">
+                <h2>🔐 Recuperar Senha</h2>
+                <p id="emailResetStep1Text">Digite seu email para receber o código de recuperação</p>
+                <p id="emailResetStep2Text" style="display: none;">Digite o código de 6 dígitos enviado para seu email</p>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Step 1: Solicitar Código -->
+                <form id="requestResetCodeForm" style="display: block;">
+                    <div class="form-group">
+                        <label for="resetEmail">Email:</label>
+                        <input type="email" id="resetEmail" placeholder="seu@email.com" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-envelope"></i>
+                        Enviar Código
+                    </button>
+                </form>
+                
+                <!-- Step 2: Verificar Código e Nova Senha -->
+                <form id="verifyResetCodeForm" style="display: none;">
+                    <div class="form-group">
+                        <label for="resetCode">Código de 6 Dígitos:</label>
+                        <input type="text" id="resetCode" placeholder="000000" maxlength="6" required style="text-align: center; font-size: 24px; letter-spacing: 10px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resetNewPass">Nova Senha:</label>
+                        <input type="password" id="resetNewPass" placeholder="Digite a nova senha (mín. 4 caracteres)" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resetConfirmPass">Confirmar Nova Senha:</label>
+                        <input type="password" id="resetConfirmPass" placeholder="Digite novamente a nova senha" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-key"></i>
+                        Resetar Senha
+                    </button>
+                    
+                    <button type="button" class="btn-secondary" onclick="cloudShare.backToRequestCode()" style="margin-top: 10px; width: 100%;">
+                        <i class="fas fa-arrow-left"></i>
+                        Voltar
+                    </button>
+                </form>
+                
+                <div class="login-footer" style="margin-top: 20px;">
+                    <p><a href="#" id="backToLoginFromEmail">← Voltar ao login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Script do módulo principal -->
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+  "cloudshare": {
+    "version": "2.0",
+    "features": [
+      "Preview de arquivos",
+      "Upload de pastas",
+      "Sistema de quotas",
+      "Autenticação segura",
+      "Migrations de banco",
+      "Notificações visuais"
+    ],
+    "users": {
+      "admin": {
+        "username": "admin",
+        "password": "admin123",
+        "type": "administrator",
+        "quota": "unlimited"
+      },
+      "default": {
+        "quota": "6GB"
+      },
+      "premium": {
+        "quota": "50GB"
+      }
+    },
+    "supported_previews": {
+      "images": ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp"],
+      "videos": ["mp4", "webm", "ogg"],
+      "documents": ["pdf"],
+      "text": ["txt", "html", "css", "js", "json", "xml", "csv", "md"]
+    },
+    "database": {
+      "type": "PostgreSQL",
+      "port": 9000,
+      "migrations": true
+    }
+  }
+}

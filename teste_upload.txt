@@ -1,0 +1,11 @@
+Este é um arquivo de teste para verificar se o sistema de upload está funcionando corretamente.
+
+Funcionalidades testadas:
+✅ Upload sem erro de quota
+✅ Sistema responsivo para mobile
+✅ PWA instalável
+✅ Exclusão por dispositivo
+✅ Autenticação
+✅ Interface mobile-friendly
+
+CloudShare v2.0 - Sistema de Upload PWA

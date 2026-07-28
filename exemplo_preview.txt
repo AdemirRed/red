@@ -1,0 +1,28 @@
+Este é um arquivo de exemplo para demonstrar o sistema de preview do CloudShare v2.0.
+
+O sistema agora suporta preview para:
+- Imagens (JPEG, PNG, GIF, WebP, SVG, BMP)
+- Vídeos (MP4, WebM, OGG)
+- PDFs
+- Arquivos de texto (TXT, HTML, CSS, JS, JSON, XML, CSV)
+
+Funcionalidades implementadas:
+✅ Preview estilo YouTube para vídeos
+✅ Visualização de imagens responsiva
+✅ Leitor de PDF integrado
+✅ Editor de texto com syntax highlighting
+✅ Modal elegante com metadados detalhados
+✅ Botões de ação (Preview, Download, Excluir)
+✅ Usuário administrador criado (admin/admin123)
+
+Quotas por usuário:
+- Usuário padrão: 6GB
+- Usuário premium: 50GB  
+- Administrador: Ilimitado
+
+Sistema de segurança robusto com:
+- Autenticação bcrypt
+- JWT tokens
+- Rate limiting
+- Validação de arquivos
+- Logs de atividade
