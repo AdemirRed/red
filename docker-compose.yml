@@ -55,19 +55,19 @@ services:
       - cloudshare_network
     restart: unless-stopped
 
-  # Frontend (opcional - para servir estático via nginx)
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   container_name: cloudshare_frontend
-  #   ports:
-  #     - "3000:80"
-  #   depends_on:
-  #     - backend
-  #   networks:
-  #     - cloudshare_network
-  #   restart: unless-stopped
+  # Frontend (Vite + Vue servido via Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cloudshare_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - cloudshare_network
+    restart: unless-stopped
 
 volumes:
   postgres_data:

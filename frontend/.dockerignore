@@ -1,0 +1,55 @@
+# Dependencies
+node_modules
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+.env.test
+
+# Build outputs
+dist
+build
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Test files
+test*.js
+*test*.js
+*.test.js
+*.spec.js
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+nginx.conf
+
+# Source maps
+*.map
+
+# Backup files
+*.backup
+*.bak
+*.tmp
+*.temp
