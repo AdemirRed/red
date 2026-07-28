@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # Banco de Dados PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: cloudshare_postgres
+    environment:
+      POSTGRES_DB: cloudshare_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "9000:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cloudshare_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cloudshare_network
+    restart: unless-stopped
+
+  # Backend Node.js
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cloudshare_backend
+    environment:
+      PORT: 8181
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: cloudshare_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: ${JWT_SECRET:-cloudshare_super_secret_key_2026}
+      SESSION_SECRET: ${SESSION_SECRET:-cloudshare_session_secret_2026}
+      EMAIL_HOST: ${EMAIL_HOST:-smtp.zoho.eu}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_USER: ${EMAIL_USER:-ademir@explorarlocais.com.br}
+      EMAIL_PASS: ${EMAIL_PASS}
+    ports:
+      - "8181:8181"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    networks:
+      - cloudshare_network
+    restart: unless-stopped
+
+  # Frontend (opcional - para servir estático via nginx)
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: cloudshare_frontend
+  #   ports:
+  #     - "3000:80"
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - cloudshare_network
+  #   restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  cloudshare_network:
+    driver: bridge
