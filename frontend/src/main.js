@@ -271,9 +271,41 @@ class CloudSharePro {
         this.setupDragAndDrop();
     }
 
+    // Decodificar JWT para extrair informações do usuário
+    parseJWT(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        } catch (e) {
+            console.error('Erro ao decodificar JWT:', e);
+            return null;
+        }
+    }
+
     async checkAuth() {
         const token = localStorage.getItem('token');
         if (token) {
+            // Primeiro, decodificar o token JWT para pegar dados imediatos
+            const tokenData = this.parseJWT(token);
+            if (tokenData) {
+                // Setar dados básicos do JWT IMEDIATAMENTE (antes da chamada à API)
+                this.currentUser = {
+                    id: tokenData.id,
+                    username: tokenData.username,
+                    email: tokenData.email || '',
+                    is_admin: tokenData.isAdmin || false,
+                    is_premium: tokenData.isPremium || false
+                };
+                this.authToken = token;
+                // Atualizar UI com dados do JWT (instantâneo)
+                this.updateUIForLoggedInUser();
+            }
+
+            // Depois, buscar dados completos/atualizados da API
             try {
                 const response = await fetch(`${this.apiBase}/api/user`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -281,8 +313,16 @@ class CloudSharePro {
 
                 if (response.ok) {
                     const userData = await response.json();
-                    this.currentUser = userData;
-                    this.authToken = token;
+                    // Atualizar com dados completos da API
+                    this.currentUser = {
+                        id: userData.user.id,
+                        username: userData.user.username,
+                        email: userData.user.email,
+                        is_admin: userData.user.isAdmin,
+                        is_premium: userData.user.isPremium,
+                        storage_quota: userData.user.storageQuota,
+                        created_at: userData.user.createdAt
+                    };
                     this.updateUIForLoggedInUser();
                 } else {
                     localStorage.removeItem('token');
@@ -290,8 +330,7 @@ class CloudSharePro {
                 }
             } catch (error) {
                 console.error('Erro ao verificar autenticação:', error);
-                localStorage.removeItem('token');
-                this.updateUIForGuestUser();
+                // Não remover token em caso de erro de rede - manter dados do JWT
             }
         } else {
             this.updateUIForGuestUser();
