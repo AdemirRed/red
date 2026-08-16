@@ -2,11 +2,11 @@ const { Pool } = require('pg');
 
 // Configuração do banco de dados
 const dbConfig = {
-  user: 'postgres',
-  host: 'localhost',
-  database: 'cloudshare_db',
-  password: 'admin123',
-  port: 9000,
+  user: process.env.DB_USER || 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  database: process.env.DB_NAME || 'cloudshare_db',
+  password: process.env.DB_PASSWORD || 'admin123',
+  port: parseInt(process.env.DB_PORT || '9000'),
   max: 20, // máximo de conexões no pool
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,

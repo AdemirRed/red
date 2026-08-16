@@ -88,7 +88,10 @@ app.use(cors({
         'http://localhost:3000',
         'http://127.0.0.1:3000',
         'http://redblackspy.ddns.net:3000',
-        'https://redblackspy.ddns.net:3000'
+        'https://redblackspy.ddns.net:3000',
+        'http://184.107.106.222:3000',
+        'http://184.107.106.222:8181',
+        'http://184.107.106.222'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
