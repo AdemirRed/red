@@ -98,6 +98,10 @@
                             <i class="fas fa-cog"></i>
                             Configurações
                         </a>
+                        <a href="#" id="adminPanelBtn" class="menu-item" style="display: none;">
+                            <i class="fas fa-user-shield"></i>
+                            Painel Admin
+                        </a>
                         <hr>
                         <a href="#" id="logoutBtn" class="menu-item">
                             <i class="fas fa-sign-out-alt"></i>
@@ -712,6 +716,144 @@
                 
                 <div class="login-footer" style="margin-top: 20px;">
                     <p><a href="#" id="backToLoginFromEmail">← Voltar ao login</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Painel Admin -->
+        <div id="adminModal" class="modal admin-modal" style="display: none;">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-shield"></i> Painel de Administração</h2>
+                <button class="close-btn" onclick="cloudShare.hideAllModals()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" data-tab="users">
+                        <i class="fas fa-users"></i> Gerenciar Usuários
+                    </button>
+                    <button class="admin-tab" data-tab="stats">
+                        <i class="fas fa-chart-bar"></i> Estatísticas
+                    </button>
+                </div>
+
+                <div class="admin-content">
+                    <!-- Aba de Usuários -->
+                    <div id="adminUsersTab" class="admin-tab-content active">
+                        <div class="admin-actions">
+                            <button class="btn-primary" onclick="cloudShare.showCreateUserForm()">
+                                <i class="fas fa-user-plus"></i> Novo Usuário
+                            </button>
+                            <button class="btn-secondary" onclick="cloudShare.refreshAdminUsers()">
+                                <i class="fas fa-sync"></i> Atualizar
+                            </button>
+                        </div>
+
+                        <div id="createUserForm" class="card" style="display: none; margin: 20px 0;">
+                            <h3>Criar Novo Usuário</h3>
+                            <form id="adminCreateUserForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Nome de usuário:</label>
+                                        <input type="text" id="newUsername" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email:</label>
+                                        <input type="email" id="newUserEmail" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Senha:</label>
+                                        <input type="password" id="newUserPassword" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tipo de conta:</label>
+                                        <select id="newUserType">
+                                            <option value="regular">Regular</option>
+                                            <option value="premium">Premium</option>
+                                            <option value="admin">Administrador</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">
+                                        <i class="fas fa-check"></i> Criar Usuário
+                                    </button>
+                                    <button type="button" class="btn-secondary" onclick="cloudShare.hideCreateUserForm()">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="users-table-container">
+                            <table id="usersTable" class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Usuário</th>
+                                        <th>Email</th>
+                                        <th>Tipo</th>
+                                        <th>Arquivos</th>
+                                        <th>Armazenamento</th>
+                                        <th>Criado em</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <tr>
+                                        <td colspan="8" style="text-align: center; padding: 40px;">
+                                            <i class="fas fa-spinner fa-spin"></i> Carregando usuários...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Aba de Estatísticas -->
+                    <div id="adminStatsTab" class="admin-tab-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-label">Total de Usuários</div>
+                                    <div class="stat-value" id="statTotalUsers">-</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-file"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-label">Total de Arquivos</div>
+                                    <div class="stat-value" id="statTotalFiles">-</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-label">Armazenamento Total</div>
+                                    <div class="stat-value" id="statTotalStorage">-</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-label">Usuários Premium</div>
+                                    <div class="stat-value" id="statPremiumUsers">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

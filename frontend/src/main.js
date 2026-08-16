@@ -214,6 +214,31 @@ class CloudSharePro {
             });
         }
 
+        // Admin Panel Button
+        const adminPanelBtn = document.getElementById('adminPanelBtn');
+        if (adminPanelBtn) {
+            adminPanelBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showAdminPanel();
+            });
+        }
+
+        // Admin Tabs
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                this.switchAdminTab(tab.dataset.tab);
+            });
+        });
+
+        // Admin Create User Form
+        const adminCreateUserForm = document.getElementById('adminCreateUserForm');
+        if (adminCreateUserForm) {
+            adminCreateUserForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleCreateUser();
+            });
+        }
+
         // Settings Tabs
         document.querySelectorAll('.settings-tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -360,6 +385,12 @@ class CloudSharePro {
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.style.display = 'block';
+        }
+
+        // Mostrar/esconder botão admin
+        const adminPanelBtn = document.getElementById('adminPanelBtn');
+        if (adminPanelBtn) {
+            adminPanelBtn.style.display = this.currentUser.is_admin ? 'block' : 'none';
         }
 
         // Verificar se existem seções de login/usuário para atualizar
@@ -2038,6 +2069,342 @@ class CloudSharePro {
         document.getElementById('resetCode').value = '';
         document.getElementById('resetNewPass').value = '';
         document.getElementById('resetConfirmPass').value = '';
+    }
+
+    // ===== PAINEL DE ADMINISTRAÇÃO =====
+
+    showAdminPanel() {
+        this.hideAllModals();
+        document.getElementById('adminModal').style.display = 'block';
+        document.getElementById('modalOverlay').style.display = 'flex';
+        this.loadAdminUsers();
+        this.loadAdminStats();
+    }
+
+    switchAdminTab(tabName) {
+        // Atualizar tabs
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+        // Atualizar conteúdo
+        document.querySelectorAll('.admin-tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        if (tabName === 'users') {
+            document.getElementById('adminUsersTab').classList.add('active');
+            this.loadAdminUsers();
+        } else if (tabName === 'stats') {
+            document.getElementById('adminStatsTab').classList.add('active');
+            this.loadAdminStats();
+        }
+    }
+
+    async loadAdminUsers() {
+        try {
+            const response = await fetch(`${this.apiBase}/api/admin/users`, {
+                headers: { 'Authorization': `Bearer ${this.authToken}` }
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao carregar usuários');
+            }
+
+            const data = await response.json();
+            this.renderUsersTable(data.users || []);
+
+        } catch (error) {
+            console.error('Erro ao carregar usuários:', error);
+            this.showMessage('❌ Erro ao carregar usuários', 'error');
+        }
+    }
+
+    renderUsersTable(users) {
+        const tbody = document.getElementById('usersTableBody');
+        
+        if (users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">Nenhum usuário encontrado</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = users.map(user => `
+            <tr>
+                <td>${user.id}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        ${user.is_admin ? '<i class="fas fa-crown" style="color: #ffd700;" title="Admin"></i>' : ''}
+                        ${user.is_premium ? '<i class="fas fa-star" style="color: #4CAF50;" title="Premium"></i>' : ''}
+                        <strong>${user.username}</strong>
+                    </div>
+                </td>
+                <td>${user.email || '-'}</td>
+                <td>
+                    ${user.is_admin ? '<span class="badge badge-admin">Admin</span>' : ''}
+                    ${user.is_premium && !user.is_admin ? '<span class="badge badge-premium">Premium</span>' : ''}
+                    ${!user.is_admin && !user.is_premium ? '<span class="badge badge-regular">Regular</span>' : ''}
+                </td>
+                <td>${user.file_count || 0}</td>
+                <td>${this.formatFileSize(user.total_storage || 0)}</td>
+                <td>${user.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR') : '-'}</td>
+                <td>
+                    <div class="action-buttons">
+                        ${!user.is_admin ? `
+                            <button class="btn-icon btn-success" onclick="cloudShare.promoteToAdmin(${user.id})" title="Promover a Admin">
+                                <i class="fas fa-user-shield"></i>
+                            </button>
+                        ` : `
+                            <button class="btn-icon btn-warning" onclick="cloudShare.demoteFromAdmin(${user.id})" title="Remover Admin">
+                                <i class="fas fa-user-minus"></i>
+                            </button>
+                        `}
+                        ${!user.is_premium && !user.is_admin ? `
+                            <button class="btn-icon btn-primary" onclick="cloudShare.promoveToPremium(${user.id})" title="Promover a Premium">
+                                <i class="fas fa-star"></i>
+                            </button>
+                        ` : user.is_premium && !user.is_admin ? `
+                            <button class="btn-icon btn-secondary" onclick="cloudShare.demoteFromPremium(${user.id})" title="Remover Premium">
+                                <i class="fas fa-star-half-alt"></i>
+                            </button>
+                        ` : ''}
+                        ${user.id !== this.currentUser.id ? `
+                            <button class="btn-icon btn-danger" onclick="cloudShare.deleteUser(${user.id}, '${user.username}')" title="Deletar Usuário">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async loadAdminStats() {
+        try {
+            const response = await fetch(`${this.apiBase}/api/admin/stats`, {
+                headers: { 'Authorization': `Bearer ${this.authToken}` }
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao carregar estatísticas');
+            }
+
+            const data = await response.json();
+            const stats = data.stats;
+
+            document.getElementById('statTotalUsers').textContent = stats.total_users || 0;
+            document.getElementById('statTotalFiles').textContent = stats.total_files || 0;
+            document.getElementById('statTotalStorage').textContent = this.formatFileSize(stats.total_storage || 0);
+            document.getElementById('statPremiumUsers').textContent = stats.premium_users || 0;
+
+        } catch (error) {
+            console.error('Erro ao carregar estatísticas:', error);
+            this.showMessage('❌ Erro ao carregar estatísticas', 'error');
+        }
+    }
+
+    showCreateUserForm() {
+        document.getElementById('createUserForm').style.display = 'block';
+    }
+
+    hideCreateUserForm() {
+        document.getElementById('createUserForm').style.display = 'none';
+        document.getElementById('adminCreateUserForm').reset();
+    }
+
+    async handleCreateUser() {
+        const username = document.getElementById('newUsername').value.trim();
+        const email = document.getElementById('newUserEmail').value.trim();
+        const password = document.getElementById('newUserPassword').value;
+        const userType = document.getElementById('newUserType').value;
+
+        if (!username || !email || !password) {
+            this.showMessage('❌ Preencha todos os campos', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.apiBase}/api/admin/users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.authToken}`
+                },
+                body: JSON.stringify({
+                    username,
+                    email,
+                    password,
+                    is_admin: userType === 'admin',
+                    is_premium: userType === 'premium' || userType === 'admin'
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                this.showMessage('✅ Usuário criado com sucesso!', 'success');
+                this.hideCreateUserForm();
+                this.loadAdminUsers();
+            } else {
+                this.showMessage(`❌ ${data.message || 'Erro ao criar usuário'}`, 'error');
+            }
+
+        } catch (error) {
+            console.error('Erro ao criar usuário:', error);
+            this.showMessage('❌ Erro de conexão', 'error');
+        }
+    }
+
+    async promoteToAdmin(userId) {
+        if (!confirm('Promover este usuário a Administrador?')) return;
+
+        try {
+            const response = await fetch(`${this.apiBase}/api/admin/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.authToken}`
+                },
+                body: JSON.stringify({
+                    is_admin: true,
+                    is_premium: true
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                this.showMessage('✅ Usuário promovido a Administrador!', 'success');
+                this.loadAdminUsers();
+            } else {
+                this.showMessage(`❌ ${data.message || 'Erro ao promover usuário'}`, 'error');
+            }
+
+        } catch (error) {
+            console.error('Erro ao promover usuário:', error);
+            this.showMessage('❌ Erro de conexão', 'error');
+        }
+    }
+
+    async demoteFromAdmin(userId) {
+        if (!confirm('Remover privilégios de Administrador deste usuário?')) return;
+
+        try {
+            const response = await fetch(`${this.apiBase}/api/admin/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.authToken}`
+                },
+                body: JSON.stringify({
+                    is_admin: false
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                this.showMessage('✅ Privilégios de Admin removidos!', 'success');
+                this.loadAdminUsers();
+            } else {
+                this.showMessage(`❌ ${data.message || 'Erro ao remover privilégios'}`, 'error');
+            }
+
+        } catch (error) {
+            console.error('Erro ao remover privilégios:', error);
+            this.showMessage('❌ Erro de conexão', 'error');
+        }
+    }
+
+    async promoveToPremium(userId) {
+        if (!confirm('Promover este usuário a Premium?')) return;
+
+        try {
+            const response = await fetch(`${this.apiBase}/api/admin/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.authToken}`
+                },
+                body: JSON.stringify({
+                    is_premium: true
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                this.showMessage('✅ Usuário promovido a Premium!', 'success');
+                this.loadAdminUsers();
+            } else {
+                this.showMessage(`❌ ${data.message || 'Erro ao promover usuário'}`, 'error');
+            }
+
+        } catch (error) {
+            console.error('Erro ao promover usuário:', error);
+            this.showMessage('❌ Erro de conexão', 'error');
+        }
+    }
+
+    async demoteFromPremium(userId) {
+        if (!confirm('Remover status Premium deste usuário?')) return;
+
+        try {
+            const response = await fetch(`${this.apiBase}/api/admin/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.authToken}`
+                },
+                body: JSON.stringify({
+                    is_premium: false
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                this.showMessage('✅ Status Premium removido!', 'success');
+                this.loadAdminUsers();
+            } else {
+                this.showMessage(`❌ ${data.message || 'Erro ao remover status'}`, 'error');
+            }
+
+        } catch (error) {
+            console.error('Erro ao remover status:', error);
+            this.showMessage('❌ Erro de conexão', 'error');
+        }
+    }
+
+    async deleteUser(userId, username) {
+        if (!confirm(`ATENÇÃO: Deletar o usuário "${username}"?\n\nTodos os arquivos deste usuário serão DELETADOS permanentemente!\n\nEsta ação NÃO pode ser desfeita!`)) return;
+
+        try {
+            const response = await fetch(`${this.apiBase}/api/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                this.showMessage('✅ Usuário deletado com sucesso!', 'success');
+                this.loadAdminUsers();
+            } else {
+                this.showMessage(`❌ ${data.message || 'Erro ao deletar usuário'}`, 'error');
+            }
+
+        } catch (error) {
+            console.error('Erro ao deletar usuário:', error);
+            this.showMessage('❌ Erro de conexão', 'error');
+        }
+    }
+
+    refreshAdminUsers() {
+        this.loadAdminUsers();
+        this.showMessage('🔄 Atualizando lista de usuários...', 'info');
     }
 }
 
