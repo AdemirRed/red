@@ -1,21 +1,18 @@
-version: '3.8'
-
 services:
   # Banco de Dados PostgreSQL
   postgres:
     image: postgres:16-alpine
     container_name: cloudshare_postgres
     environment:
-      POSTGRES_DB: cloudshare_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${DB_NAME:-cloudshare}
+      POSTGRES_USER: ${DB_USER:-cloudshare_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-cloudshare_pass_2026}
     ports:
-      - "9000:5432"
+      - "${DB_PORT:-9000}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d cloudshare_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-cloudshare_user} -d ${DB_NAME:-cloudshare}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,9 +31,9 @@ services:
       NODE_ENV: production
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: cloudshare_db
-      DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_NAME: ${DB_NAME:-cloudshare}
+      DB_USER: ${DB_USER:-cloudshare_user}
+      DB_PASSWORD: ${DB_PASSWORD:-cloudshare_pass_2026}
       JWT_SECRET: ${JWT_SECRET:-cloudshare_super_secret_key_2026}
       SESSION_SECRET: ${SESSION_SECRET:-cloudshare_session_secret_2026}
       EMAIL_HOST: ${EMAIL_HOST:-smtp.zoho.eu}
