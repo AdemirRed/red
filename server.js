@@ -850,6 +850,45 @@ app.get('/api/auth/me', auth.optionalAuth, async (req, res) => {
 // ROTAS DE USUÁRIO
 // ===========================================
 
+// Obter informações do usuário logado
+app.get('/api/user', auth.authenticateToken, async (req, res) => {
+    try {
+        const result = await db.query(
+            'SELECT id, username, email, is_admin, is_premium, storage_quota, created_at FROM users WHERE id = $1',
+            [req.user.id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Usuário não encontrado'
+            });
+        }
+
+        const user = result.rows[0];
+
+        res.json({
+            success: true,
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                isAdmin: user.is_admin,
+                isPremium: user.is_premium,
+                storageQuota: user.storage_quota,
+                createdAt: user.created_at
+            }
+        });
+
+    } catch (error) {
+        console.error('Erro ao buscar usuário:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao buscar informações do usuário'
+        });
+    }
+});
+
 // Atualizar perfil do usuário
 app.put('/api/user/profile', auth.authenticateToken, async (req, res) => {
     try {
